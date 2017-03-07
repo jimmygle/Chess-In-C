@@ -2,32 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// struct Square {
-// 	char color;
-// 	int positionX;
-// 	int positionY;
-// }
-
-// void drawGrid()
-// {
-// 	struct Square board[64];
-
-// 	int rowCount = 8;
-// 	int colCount = 8;
-// 	int squareNum = 0;
-// 	int row;
-// 	int col;
-// 	char color = 'b';
-
-// 	for (row = 0; row < rowCount; row++) {
-// 		for (col = 0; col < colCount; col++) {
-// 			board[squareNum] = { *color, row+1, col+1 };
-// 			squareNum++;
-// 		}
-// 	}	
-
-// }
-
 struct Piece {
 	char name;
 	int posRow;
@@ -57,12 +31,8 @@ int transColCharToInt(char posCol, struct ColumnMap *colMap) {
 	}
 }
 
-// void printHelpMenu() {
-// 	printf("\n Options:\n [n]ew game.\n [p]iece positions.\n [h]elp and options.\n [e]xit game.\n\n");
-// }
-
 void printPiecePositions(struct Piece *whitePieces, struct Piece *blackPieces, struct ColumnMap *colMap) {
-	printf(" White   Black\n -----   -----\n");
+	printf("\n White   Black\n -----   -----\n");
 	int i;
 	char translatedColWhite;
 	char translatedColBlack;
@@ -72,15 +42,6 @@ void printPiecePositions(struct Piece *whitePieces, struct Piece *blackPieces, s
 		printf(" %c  %c%d   %c  %c%d\n", whitePieces[i].name, translatedColWhite, whitePieces[i].posRow, blackPieces[i].name, translatedColBlack, blackPieces[i].posRow);
 	}
 }
-
-// void startNewGame(char *currentTurnPlayer)
-// {
-// 	scanf("%c", currentTurnPlayer);
-// 	printf("You selected: %c", *currentTurnPlayer);
-// 	// Who's going first
-// 	// printf("Who's going first? (`w` or `b`)?\n> ");
-// 	// scanf("%c", currentTurnPlayer);
-// }
 
 int main() 
 {
@@ -145,11 +106,11 @@ int main()
 
 		// Determine player turn
 		if (currentTurnPlayer == 'w') {
-			printf("White's turn: ");
+			printf("\nWhite's turn: ");
 			nextTurnPlayer = 'b';
 			activePieces = whitePieces;
 		} else {
-			printf("Black's turn: ");
+			printf("\nBlack's turn: ");
 			nextTurnPlayer = 'w';
 			activePieces = blackPieces;
 		}
@@ -160,7 +121,7 @@ int main()
 		// Print board if 'board' text input
 		if (strcmp(playerInput, "board") == 0) {
 			printPiecePositions(whitePieces, blackPieces, colMap);
-			skipAdvancingTurn = 1;
+			continue;
 		}
 
 		// Move the piece
@@ -171,21 +132,29 @@ int main()
 			int translatedColStart = transColCharToInt(playerInput[0], colMap);
 			int playerInputRowStart = atoi(&playerInput[1]);
 			int translatedColEnd = transColCharToInt(playerInput[3], colMap);
+			int playerInputRowEnd = atoi(&playerInput[4]);
+
+			// Check input is within bounds of board
+			if (translatedColEnd > 15 && playerInputRowEnd > 15) {
+				printf("Out of board bounds.\n");
+				continue;
+			}
 
 			// Find piece
 			if (activePieces[i].name == playerInput[2] && activePieces[i].posCol == translatedColStart && activePieces[i].posRow == playerInputRowStart) {
-				// Check that piece is of correct team
-
-				// Check that piece wants to move within bounds of board
-
 				// Check that piece can move according to its rules
 
 				// Check if piece collides with other piece
 
 				// Move it
 				activePieces[i].posCol = translatedColEnd;
-				activePieces[i].posRow = atoi(&playerInput[4]);
+				activePieces[i].posRow = playerInputRowEnd;
 				printPiecePositions(whitePieces, blackPieces, colMap);
+				if (currentTurnPlayer == 'w') {
+					printf("\nWhite moved: %c%c%c%c%c", playerInput[0], playerInput[1], playerInput[2], playerInput[3], playerInput[4]);
+				} else {
+					printf("\nBlack moved: %c%c%c%c%c", playerInput[0], playerInput[1], playerInput[2], playerInput[3], playerInput[4]);
+				}
 				continue;
 			}
 		}
@@ -194,85 +163,6 @@ int main()
 			currentTurnPlayer = nextTurnPlayer;
 		}
 	}
-
-	// printf("\nWELCOME TO CHESS IN C\n");
-	// printf("\nWhat would you like to do (`h` for options)?\n> ");
-	// int firstRun = 1;
-	// char input;
-	// char currentTurnPlayer;
-	// while (1) {
-	// 	switch (input) {
-	// 		case 'n':
-	// 			startNewGame(&currentTurnPlayer);
-	// 			// printf("It's %c's turn.\n", *currentTurnPlayer);
-	// 			break;
-	// 		case 'e':
-	// 			printf("Bye, bye!\n\n");
-	// 			return 0;
-	// 		break;
-	// 		case 'p':
-	// 			printPiecePositions(whitePieces, blackPieces);
-	// 			break;
-	// 		case 'h':
-	// 			printHelpMenu();
-	// 			break;
-	// 	}
-	// 	scanf("%c", &input);			
-	// 	printf("> ");
-
-	// 	// printf("%c", input);
-	// 	// printPiecePositions(whitePieces, blackPieces);
-	// }
-
-	// printf("White   Black\n-----   -----\n");
-	// int i;
-	// for (i = 0; i < 16; i++) {
-	// 	printf("%c  %c%d   %c  %c%d\n", whitePieces[i].name, whitePieces[i].posCol, whitePieces[i].posRow, blackPieces[i].name, blackPieces[i].posCol, blackPieces[i].posRow);
-	// }
-
-	// // Get the piece to move
-	// char inputPiece;
-	// int inputPosX;
-	// int inputPosY;
-	// printf("----\nWhat piece would you like to move (eg p2,6)\n>");
-	// scanf("%c%d,%d", &inputPiece, &inputPosX, &inputPosY);
-	// printf("----\nYou entered: %c%d,%d\n", inputPiece, inputPosX, inputPosY);
-	
-	// // Locate the piece to move
-	// struct Piece * selectedPiece;
-	// int pieceFound = 0;
-	// for (i = 0; i < 16; i++) {
-	// 	if (whitePieces[i].positionX == inputPosX && whitePieces[i].positionY == inputPosY) {
-	// 		selectedPiece = &whitePieces[i];
-	// 		pieceFound = 1;
-	// 		break;
-	// 	}
-	// }
-
-	// if (pieceFound == 1) {	
-	// 	printf("Found it: %c\n", selectedPiece->name);
-	// } else {
-	// 	printf("Didn't find it.\n");
-	// }
-
-	// // Move the piece
-	// int newInputPosX;
-	// int newInputPosY;
-	// char confirm[1];
-	// printf("Where would you like to move the %c at %d, %d? (eg 4,6)?\n>", inputPiece, inputPosX, inputPosY);
-	// scanf("%d,%d", &newInputPosX, &newInputPosY);
-	// //printf("Are you sure you want to move %c from %d, %d to %d, %d? (y/n)\n>", inputPiece, inputPosX, inputPosY, newInputPosX, newInputPosY);
-	// //scanf("%c", &confirm);
-
-	// //printf("Confirmed: %c", confirm);
-
-	// //if (*confirm == 'y')
-	// //{
-	// 	// Move the piece
-	// 	selectedPiece->positionX = newInputPosX;
-	// 	selectedPiece->positionY = newInputPosY;
-	// 	printf("New position for %c: %d, %d", inputPiece, selectedPiece->positionX, selectedPiece->positionY);
-	// //}
 
 	return 0;
 }
