@@ -10,13 +10,12 @@ This is a Chess game written in C. It uses standard [Chess notation](https://en.
 
 # To Do
 
-* Add logic that ensures movement is current team's piece
-* Add logic that ensures movement is within bounds of board
+* Add automated testing capabilities
 * Add logic that ensures movement is valid for each respective piece
 * Add collision detection and capturing of opponent pieces
 * Add logic for check and checkmate
 
-# Big Maybes
+# Ideas
 
 * Rudimentary visual representation of the board that's not simply Chess notation in a table
 * Basic AI (to experiment with algorithm development)
