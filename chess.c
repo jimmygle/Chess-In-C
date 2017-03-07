@@ -6,6 +6,8 @@ struct Piece {
 	char name;
 	int posRow;
 	int posCol;
+	int moves;
+	int captured;
 };
 
 struct ColumnMap {
@@ -48,40 +50,16 @@ int main()
 
 	// Define player pieces and start position
 	struct Piece whitePieces[16] = {
-		{ 'R', 1, 1 },		
-		{ 'N', 1, 2 },
-		{ 'B', 1, 3 },
-		{ 'Q', 1, 4 },
-		{ 'K', 1, 5 },
-		{ 'B', 1, 6 },
-		{ 'N', 1, 7 },
-		{ 'R', 1, 8 },
-		{ '-', 2, 1 },
-		{ '-', 2, 2 },
-		{ '-', 2, 3 },
-		{ '-', 2, 4 },
-		{ '-', 2, 5 },
-		{ '-', 2, 6 },
-		{ '-', 2, 7 },
-		{ '-', 2, 8 }
+		{ 'R', 1, 1, 0, 0 }, { 'N', 1, 2, 0, 0 }, { 'B', 1, 3, 0, 0 }, { 'Q', 1, 4, 0, 0 },
+		{ 'K', 1, 5, 0, 0 }, { 'B', 1, 6, 0, 0 }, { 'N', 1, 7, 0, 0 }, { 'R', 1, 8, 0, 0 },
+		{ '-', 2, 1, 0, 0 }, { '-', 2, 2, 0, 0 }, { '-', 2, 3, 0, 0 }, { '-', 2, 4, 0, 0 },
+		{ '-', 2, 5, 0, 0 }, { '-', 2, 6, 0, 0 }, { '-', 2, 7, 0, 0 }, { '-', 2, 8, 0, 0 }
 	};
 	struct Piece blackPieces[16] = {
-		{ 'R', 8, 1 },		
-		{ 'N', 8, 2 },
-		{ 'B', 8, 3 },
-		{ 'Q', 8, 4 },
-		{ 'K', 8, 5 },
-		{ 'B', 8, 6 },
-		{ 'N', 8, 7 },
-		{ 'R', 8, 8 },
-		{ '-', 7, 1 },
-		{ '-', 7, 2 },
-		{ '-', 7, 3 },
-		{ '-', 7, 4 },
-		{ '-', 7, 5 },
-		{ '-', 7, 6 },
-		{ '-', 7, 7 },
-		{ '-', 7, 7 }
+		{ 'R', 8, 1, 0, 0 }, { 'N', 8, 2, 0, 0 }, { 'B', 8, 3, 0, 0 }, { 'Q', 8, 4, 0, 0 },
+		{ 'K', 8, 5, 0, 0 }, { 'B', 8, 6, 0, 0 }, { 'N', 8, 7, 0, 0 }, { 'R', 8, 8, 0, 0 },
+		{ '-', 7, 1, 0, 0 }, { '-', 7, 2, 0, 0 }, { '-', 7, 3, 0, 0 }, { '-', 7, 4, 0, 0 },
+		{ '-', 7, 5, 0, 0 }, { '-', 7, 6, 0, 0 }, { '-', 7, 7, 0, 0 }, { '-', 7, 8, 0, 0 }
 	};
 
 	struct ColumnMap colMap[8] = {
@@ -143,6 +121,11 @@ int main()
 			// Find piece
 			if (activePieces[i].name == playerInput[2] && activePieces[i].posCol == translatedColStart && activePieces[i].posRow == playerInputRowStart) {
 				// Check that piece can move according to its rules
+				if (playerInput[2] == '-') { // pawn
+					// can move two if 0 moves, otherwise can move 1
+					// can only move forward
+					// can capture in front and to the left or right 1
+				}
 
 				// Check if piece collides with other piece
 
