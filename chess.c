@@ -6,7 +6,7 @@ struct Piece {
 	char name;
 	int posRow;
 	int posCol;
-	int moves;
+	int moveCount;
 	int captured;
 };
 
@@ -81,6 +81,7 @@ int main()
 	// Instantiate player input
 	char playerInput[6];
 	while (1) {
+		skipAdvancingTurn = 0;
 
 		// Determine player turn
 		if (currentTurnPlayer == 'w') {
@@ -113,16 +114,31 @@ int main()
 			int playerInputRowEnd = atoi(&playerInput[4]);
 
 			// Check input is within bounds of board
-			if (translatedColEnd > 15 && playerInputRowEnd > 15) {
-				printf("Out of board bounds.\n");
-				continue;
+			if (translatedColEnd > 8 || playerInputRowEnd > 8) {
+				printf("Error: Out of board bounds.\n");
+				skipAdvancingTurn = 1;
+				break; // Fast forward the loop
 			}
 
 			// Find piece
 			if (activePieces[i].name == playerInput[2] && activePieces[i].posCol == translatedColStart && activePieces[i].posRow == playerInputRowStart) {
 				// Check that piece can move according to its rules
+				printf("\nDEBUG: %d %d %d\n", playerInputRowEnd, playerInputRowStart, activePieces[i].moveCount);
 				if (playerInput[2] == '-') { // pawn
-					// can move two if 0 moves, otherwise can move 1
+					// can move 2 if 0 moves
+					if (activePieces[i].moveCount < 1 && abs(playerInputRowEnd - playerInputRowStart) > 2) {
+						printf("Pawn in starting row can only move one or two row(s) ahead, or capture.\n");
+						skipAdvancingTurn = 1;
+						break;
+					}
+
+					// can move 1 if more than 1 moves
+					if (activePieces[i].moveCount > 0 && abs(playerInputRowEnd - playerInputRowStart) > 1) {
+						printf("Pawn can only move forward one space, or capture.\n");
+						skipAdvancingTurn = 1;
+						break;
+					}
+
 					// can only move forward
 					// can capture in front and to the left or right 1
 				}
@@ -132,6 +148,7 @@ int main()
 				// Move it
 				activePieces[i].posCol = translatedColEnd;
 				activePieces[i].posRow = playerInputRowEnd;
+				activePieces[i].moveCount++;
 				printPiecePositions(whitePieces, blackPieces, colMap);
 				if (currentTurnPlayer == 'w') {
 					printf("\nWhite moved: %c%c%c%c%c", playerInput[0], playerInput[1], playerInput[2], playerInput[3], playerInput[4]);
