@@ -62,6 +62,7 @@ int main()
 		{ '-', 7, 5, 0, 0 }, { '-', 7, 6, 0, 0 }, { '-', 7, 7, 0, 0 }, { '-', 7, 8, 0, 0 }
 	};
 
+	// Map column lettering (for Chess notation) to integer for mathematical grid usage
 	struct ColumnMap colMap[8] = {
 		{ 1, 'a' }, { 2, 'b' }, { 3, 'c' }, { 4, 'd' },
 		{ 5, 'e' }, { 6, 'f' }, { 7, 'g' }, { 8, 'h' }
@@ -140,6 +141,17 @@ int main()
 					}
 
 					// can only move forward
+					if (currentTurnPlayer == 'w' && playerInputRowEnd <= playerInputRowStart) {
+						printf("Pawn can only move forward.\n");
+						skipAdvancingTurn = 1;
+						break;
+					}
+					if (currentTurnPlayer == 'b' && playerInputRowEnd >= playerInputRowStart) {
+						printf("Pawn can only move forward.\n");
+						skipAdvancingTurn = 1;
+						break;
+					}
+
 					// can capture in front and to the left or right 1
 				}
 
