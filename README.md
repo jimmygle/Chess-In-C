@@ -6,7 +6,7 @@ This is a Chess game written in C. It uses standard [Chess notation](https://en.
 # Run It
 
 * `make`
-* `./make`
+* `./chess`
 
 # To Do
 
