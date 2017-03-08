@@ -11,6 +11,8 @@ This is a Chess game written in C. It uses a borked [Algebraic Chess notation](h
 # To Do
 
 * Code abstraction!
+* Code documentation
+* Variable name cleanup
 * Add automated testing capabilities
 * Add logic that ensures movement is valid for each respective piece
 * Add collision detection and capturing of opponent pieces
