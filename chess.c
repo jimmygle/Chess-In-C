@@ -70,6 +70,12 @@ void setActivePieces(char activeTeam, struct Piece * pieces, struct Piece * acti
 	}
 }
 
+void movePiece(struct Piece * playerPiece, int targetRow, int targetCol) {
+	playerPiece->posRow = targetRow;
+	playerPiece->posCol = targetCol;
+	playerPiece->moveCount++;
+}
+
 int main() 
 {
 	// Define player pieces
@@ -206,9 +212,7 @@ int main()
 		}
 
 		// Move the piece
-		playerPiece->posRow = playerInputRowEnd;
-		playerPiece->posCol = translatedColEnd;
-		playerPiece->moveCount++;
+		movePiece(playerPiece, playerInputRowEnd, translatedColEnd);
 		if (currentTurnPlayer == 'w') {
 			printf("\nWhite moved: %c%c%c%c%c", playerInput[0], playerInput[1], playerInput[2], playerInput[3], playerInput[4]);
 		} else {
