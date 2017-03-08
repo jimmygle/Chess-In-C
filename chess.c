@@ -40,9 +40,18 @@ void printPiecePositions(struct Piece *pieces, struct ColumnMap *colMap) {
 	char translatedColWhite;
 	char translatedColBlack;
 	for (i = 0; i < 16; i++) {
-		char translatedColWhite = transColIntToChar(pieces[i].posCol, colMap);
-		char translatedColBlack = transColIntToChar(pieces[i+16].posCol, colMap);
-		printf(" %c  %c%d   %c  %c%d\n", pieces[i].name, translatedColWhite, pieces[i].posRow, pieces[i+16].name, translatedColBlack, pieces[i+16].posRow);
+		if (pieces[i].captured == 0) {
+			translatedColWhite = transColIntToChar(pieces[i].posCol, colMap);
+			printf(" %c  %c%d ", pieces[i].name, translatedColWhite, pieces[i].posRow);
+		} else {
+			printf("       \n");
+		}
+		if (pieces[i+16].captured == 0) {
+			translatedColBlack = transColIntToChar(pieces[i+16].posCol, colMap);
+			printf("  %c  %c%d\n", pieces[i+16].name, translatedColBlack, pieces[i+16].posRow);			
+		} else {
+			printf("       \n");
+		}
 	}
 }
 
@@ -172,6 +181,7 @@ int main()
 		// Apply piece specific rules
 		// pawn (-)
 		if (playerPiece->name == '-') {
+
 			// piece is in its starting position
 			if (playerPiece->moveCount < 1) {
 				// can't move more than 2 rows away
@@ -190,6 +200,11 @@ int main()
 					if (playerPieceTarget == NULL) {
 						printf("Can't move there. Pawn can only move laterally to capture.\n");
 						continue;
+					} else {
+						playerPieceTarget->captured = 1;
+						playerPieceTarget->posRow = 0;
+						playerPieceTarget->posCol = 0;
+						printf("Captured! %c%cx%c%c\n", playerInput[0], playerInput[1], playerInput[3], playerInput[4]);
 					}
 				}
 			}
@@ -218,6 +233,8 @@ int main()
 		} else {
 			printf("\nBlack moved: %c%c%c%c%c", playerInput[0], playerInput[1], playerInput[2], playerInput[3], playerInput[4]);
 		}
+
+		currentTurnPlayer = nextTurnPlayer;
 	}
 
 	return 0;
