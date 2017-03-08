@@ -46,10 +46,9 @@ void printPiecePositions(struct Piece *pieces, struct ColumnMap *colMap) {
 	}
 }
 
-struct Piece * findPiece(int row, int col, struct Piece * pieces) {
-	int totalPieces = sizeof(*pieces);
+struct Piece * findPiece(int row, int col, struct Piece * pieces, int piecesSize) {
 	int i;
-	for (i = 0; i < totalPieces; i++) {
+	for (i = 0; i < piecesSize; i++) {
 		if (pieces[i].posRow == row && pieces[i].posCol == col) {
 			return &pieces[i];
 		}
@@ -74,6 +73,20 @@ void setActivePieces(char activeTeam, struct Piece * pieces, struct Piece * acti
 int main() 
 {
 	// Define player pieces
+	// struct Piece pieces[32] = {
+	// 	// white
+	// 	{ 'R', 'w', 1, 1, 0, 0 }, { 'N', 'w', 1, 2, 0, 0 }, { 'B', 'w', 1, 3, 0, 0 }, { 'Q', 'w', 1, 4, 0, 0 },
+	// 	{ 'K', 'w', 1, 5, 0, 0 }, { 'B', 'w', 1, 6, 0, 0 }, { 'N', 'w', 1, 7, 0, 0 }, { 'R', 'w', 1, 8, 0, 0 },
+	// 	{ '-', 'w', 2, 1, 0, 0 }, { '-', 'w', 2, 2, 0, 0 }, { '-', 'w', 2, 3, 0, 0 }, { '-', 'w', 2, 4, 0, 0 },
+	// 	{ '-', 'w', 2, 5, 0, 0 }, { '-', 'w', 2, 6, 0, 0 }, { '-', 'w', 2, 7, 0, 0 }, { '-', 'w', 2, 8, 0, 0 },
+	// 	// black
+	// 	{ 'R', 'b', 8, 1, 0, 0 }, { 'N', 'b', 8, 2, 0, 0 }, { 'B', 'b', 8, 3, 0, 0 }, { 'Q', 'b', 8, 4, 0, 0 },
+	// 	{ 'K', 'b', 8, 5, 0, 0 }, { 'B', 'b', 8, 6, 0, 0 }, { 'N', 'b', 8, 7, 0, 0 }, { 'R', 'b', 8, 8, 0, 0 },
+	// 	{ '-', 'b', 7, 1, 0, 0 }, { '-', 'b', 7, 2, 0, 0 }, { '-', 'b', 7, 3, 0, 0 }, { '-', 'b', 7, 4, 0, 0 },
+	// 	{ '-', 'b', 7, 5, 0, 0 }, { '-', 'b', 7, 6, 0, 0 }, { '-', 'b', 7, 7, 0, 0 }, { '-', 'b', 7, 8, 0, 0 }
+	// };
+
+	// DEBUGGING
 	struct Piece pieces[32] = {
 		// white
 		{ 'R', 'w', 1, 1, 0, 0 }, { 'N', 'w', 1, 2, 0, 0 }, { 'B', 'w', 1, 3, 0, 0 }, { 'Q', 'w', 1, 4, 0, 0 },
@@ -84,8 +97,8 @@ int main()
 		{ 'R', 'b', 8, 1, 0, 0 }, { 'N', 'b', 8, 2, 0, 0 }, { 'B', 'b', 8, 3, 0, 0 }, { 'Q', 'b', 8, 4, 0, 0 },
 		{ 'K', 'b', 8, 5, 0, 0 }, { 'B', 'b', 8, 6, 0, 0 }, { 'N', 'b', 8, 7, 0, 0 }, { 'R', 'b', 8, 8, 0, 0 },
 		{ '-', 'b', 7, 1, 0, 0 }, { '-', 'b', 7, 2, 0, 0 }, { '-', 'b', 7, 3, 0, 0 }, { '-', 'b', 7, 4, 0, 0 },
-		{ '-', 'b', 7, 5, 0, 0 }, { '-', 'b', 7, 6, 0, 0 }, { '-', 'b', 7, 7, 0, 0 }, { '-', 'b', 7, 8, 0, 0 }
-	};
+		{ '-', 'b', 3, 5, 0, 0 }, { '-', 'b', 7, 6, 0, 0 }, { '-', 'b', 7, 7, 0, 0 }, { '-', 'b', 7, 8, 0, 0 }
+	};	
 
 	// Map column lettering (for Chess notation) to integer for mathematical grid usage
 	struct ColumnMap colMap[8] = {
@@ -108,8 +121,6 @@ int main()
 
 	// Start master loop
 	while (1) {
-		skipAdvancingTurn = 0;
-
 		// Determine player turn and set active pieces
 		if (currentTurnPlayer == 'w') {
 			printf("\nWhite's turn: ");
@@ -137,56 +148,61 @@ int main()
 		int playerInputRowEnd = atoi(&playerInput[4]);
 
 		// Find the piece
-		struct Piece * playerPiece = findPiece(playerInputRowStart, translatedColStart, *activePieces);
+		struct Piece * playerPiece = findPiece(playerInputRowStart, translatedColStart, *activePieces, 16);
 		if (playerPiece == NULL) {
 			printf("Invalid piece selected (%c%c%c).", playerInput[0], playerInput[1], playerInput[2]);
-			skipAdvancingTurn = 1;
 			continue;
 		}
 
 		// Check piece destination in bounds of board
 		if (translatedColEnd > 8 || playerInputRowEnd > 8) {
 			printf("Error: Out of board bounds.\n");
-			skipAdvancingTurn = 1;
 			continue;
 		}
+
+		// Allocate player piece destination
+		struct Piece * playerPieceTarget;
 
 		// Apply piece specific rules
 		// pawn (-)
 		if (playerPiece->name == '-') {
-			// can move 2 if 0 moves
-			if (playerPiece->moveCount < 1 && abs(playerInputRowEnd - playerInputRowStart) > 2) {
-				printf("Pawn in starting row can only move one or two row(s) ahead, or capture.\n");
-				skipAdvancingTurn = 1;
-				continue;
+			// piece is in its starting position
+			if (playerPiece->moveCount < 1) {
+				// can't move more than 2 rows away
+				if (abs(playerInputRowEnd - playerInputRowStart) > 2) {
+					printf("Pawn in starting row can only move one or two row(s) ahead.\n");
+					continue;
+				}
+				// can't move laterally more than 1
+				if (abs(playerInputRowEnd - playerInputRowStart) > 1 && abs(translatedColEnd - translatedColStart) > 1) {
+					printf("Pawn can not move laterally unless capturing.\n");
+					continue;
+				}
+				// capturing up 1 row and left/right 1 column
+				if (abs(playerInputRowEnd - playerInputRowStart) == 1 && abs(translatedColEnd - translatedColStart) == 1) {
+					playerPieceTarget = findPiece(playerInputRowEnd, translatedColEnd, pieces, 32);
+					if (playerPieceTarget == NULL) {
+						printf("Can't move there. Pawn can only move laterally to capture.\n");
+						continue;
+					}
+				}
 			}
 
 			// can move 1 if more than 1 moves
 			if (playerPiece->moveCount > 0 && abs(playerInputRowEnd - playerInputRowStart) > 1) {
 				printf("Pawn can only move forward one space, or capture.\n");
-				skipAdvancingTurn = 1;
 				continue;
 			}
 
 			// can only move forward
 			if (currentTurnPlayer == 'w' && playerInputRowEnd <= playerInputRowStart) {
 				printf("Pawn can only move forward.\n");
-				skipAdvancingTurn = 1;
 				continue;
 			}
 			if (currentTurnPlayer == 'b' && playerInputRowEnd >= playerInputRowStart) {
 				printf("Pawn can only move forward.\n");
-				skipAdvancingTurn = 1;
 				continue;
 			}
-
-			// is there a piece at desired coordinates
-			// struct Piece * targetSpacePiece = findPiece(playerInputRowEnd, translatedColEnd, pieces);
-			// if (targetSpacePiece != NULL)
-			// {
-			// 	printf("%c", targetSpacePiece->name);
-			// }
-
 		}
 
 		// Move the piece
@@ -197,10 +213,6 @@ int main()
 			printf("\nWhite moved: %c%c%c%c%c", playerInput[0], playerInput[1], playerInput[2], playerInput[3], playerInput[4]);
 		} else {
 			printf("\nBlack moved: %c%c%c%c%c", playerInput[0], playerInput[1], playerInput[2], playerInput[3], playerInput[4]);
-		}
-
-		if (skipAdvancingTurn == 0) {
-			currentTurnPlayer = nextTurnPlayer;
 		}
 	}
 
