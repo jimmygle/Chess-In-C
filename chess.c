@@ -45,6 +45,21 @@ void printPiecePositions(struct Piece *whitePieces, struct Piece *blackPieces, s
 	}
 }
 
+struct Piece * findPiece(int row, int col, struct Piece *whitePieces, struct Piece *blackPieces) {
+	struct Piece * foundPiece;
+
+	int i;
+	for (i = 0; i < 16; i++) {
+		if (whitePieces[i].posRow == row && whitePieces[i].posCol == col) {
+			return &whitePieces[i];
+		} else if (blackPieces[i].posRow == row && blackPieces[i].posCol == col) {
+			return &blackPieces[i];
+		}
+	}
+
+	return NULL;
+}
+
 int main() 
 {
 
@@ -118,7 +133,7 @@ int main()
 			if (translatedColEnd > 8 || playerInputRowEnd > 8) {
 				printf("Error: Out of board bounds.\n");
 				skipAdvancingTurn = 1;
-				break; // Fast forward the loop
+				break;
 			}
 
 			// Find piece
@@ -152,7 +167,13 @@ int main()
 						break;
 					}
 
-					// can capture in front and to the left or right 1
+					// is there a piece at desired coordinates
+					struct Piece * targetSpacePiece = findPiece(playerInputRowEnd, translatedColEnd, whitePieces, blackPieces);
+					if (targetSpacePiece != NULL)
+					{
+						printf("%c", targetSpacePiece->name);
+					}
+
 				}
 
 				// Check if piece collides with other piece
