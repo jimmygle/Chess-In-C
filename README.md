@@ -5,8 +5,8 @@ This is a Chess game written in C. It uses standard [Chess notation](https://en.
 
 # Run It
 
-* `gcc chess.c`
-* `./a.out`
+* `make`
+* `./make`
 
 # To Do
 
