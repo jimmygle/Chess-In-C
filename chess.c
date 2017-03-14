@@ -44,7 +44,7 @@ void printPiecePositions(struct Piece *pieces, struct ColumnMap *colMap) {
 			translatedColWhite = transColIntToChar(pieces[i].posCol, colMap);
 			printf(" %c  %c%d ", pieces[i].name, translatedColWhite, pieces[i].posRow);
 		} else {
-			printf("       \n");
+			printf("       ");
 		}
 		if (pieces[i+16].captured == 0) {
 			translatedColBlack = transColIntToChar(pieces[i+16].posCol, colMap);
@@ -55,7 +55,7 @@ void printPiecePositions(struct Piece *pieces, struct ColumnMap *colMap) {
 	}
 }
 
-struct Piece * findPiece(int row, int col, struct Piece * pieces, int piecesSize) {
+struct Piece *findPiece(int row, int col, struct Piece * pieces, int piecesSize) {
 	int i;
 	for (i = 0; i < piecesSize; i++) {
 		if (pieces[i].posRow == row && pieces[i].posCol == col) {
@@ -125,9 +125,6 @@ int main()
 	char nextTurnPlayer = 'b';
 	struct Piece * activePieces[16];
 
-	// Skip advancing player turn at end of master loop
-	int skipAdvancingTurn = 0;
-
 	// Print initial positions
 	printPiecePositions(pieces, colMap);
 
@@ -149,6 +146,12 @@ int main()
 
 		// Get player input
 		scanf("%s", playerInput);
+
+        // Exit if 'exit' text input
+        if (strcmp(playerInput, "exit") == 0) {
+            printf("\nBuh Bye!\n\n");
+            break;
+        }
 
 		// Print board if 'board' text input
 		if (strcmp(playerInput, "board") == 0) {
@@ -175,8 +178,8 @@ int main()
 			continue;
 		}
 
-		// Allocate player piece destination
-		struct Piece * playerPieceTarget;
+		// Player piece destination
+		struct Piece * playerPieceTarget = findPiece(playerInputRowEnd, translatedColEnd, pieces, 32);
 
 		// Apply piece specific rules
 		// pawn (-)
@@ -196,7 +199,6 @@ int main()
 				}
 				// capturing up 1 row and left/right 1 column
 				if (abs(playerInputRowEnd - playerInputRowStart) == 1 && abs(translatedColEnd - translatedColStart) == 1) {
-					playerPieceTarget = findPiece(playerInputRowEnd, translatedColEnd, pieces, 32);
 					if (playerPieceTarget == NULL) {
 						printf("Can't move there. Pawn can only move laterally to capture.\n");
 						continue;
@@ -206,10 +208,24 @@ int main()
 						playerPieceTarget->posCol = 0;
 						printf("Captured! %c%cx%c%c\n", playerInput[0], playerInput[1], playerInput[3], playerInput[4]);
 					}
+				} else {
+					// piece collision
+					if (playerPieceTarget != NULL) {
+						printf("Piece collision.\n");
+						continue;
+					}
+				}
+				// can't move over another piece
+				if (abs(playerInputRowEnd - playerInputRowStart) > 1) {
+					struct Piece * inbetweenPiece = findPiece(playerInputRowEnd - 1, translatedColEnd, pieces, 32);
+					if (inbetweenPiece != NULL) {
+						printf("Pawn can not jump over another piece.\n");
+						continue;
+					}
 				}
 			}
 
-			// can move 1 if more than 1 moves
+			// can only move 1 if more than 1 moves
 			if (playerPiece->moveCount > 0 && abs(playerInputRowEnd - playerInputRowStart) > 1) {
 				printf("Pawn can only move forward one space, or capture.\n");
 				continue;
@@ -224,6 +240,9 @@ int main()
 				printf("Pawn can only move forward.\n");
 				continue;
 			}
+
+			// can not move forward onto another piece
+
 		}
 
 		// Move the piece
