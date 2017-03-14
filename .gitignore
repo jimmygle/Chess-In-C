@@ -1,2 +1,4 @@
 *.out
 chess
+.idea
+cmake-build-debug
